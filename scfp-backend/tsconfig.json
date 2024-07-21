@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "ES6",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "baseUrl": "./src",
+    "paths": {
+      "controllers": ["controllers/*"],
+      "middlewares": ["middlewares/*"],
+      "models": ["models/*"],
+      "routes": ["routes/*"],
+      "services": ["services/*"],
+      "utils": ["utils/*"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}
