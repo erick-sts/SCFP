@@ -1,18 +1,25 @@
-import { Router } from 'express'; // Importa o roteador do Express para definir as rotas
-import { ExpenseController } from '../controllers/expenseController'; // Importa o controlador de despesas
-import { authenticateJWT } from '../middlewares/authMiddleware'; // Importa o middleware de autenticação JWT
+import { Router } from 'express';
+import { ExpenseController } from '../controllers/expenseController';
+import { authenticateJWT } from '../middlewares/authMiddleware';
 
-const router = Router(); // Cria uma instância do roteador
+const router = Router();
 
 // Aplica o middleware de autenticação JWT a todas as rotas definidas a partir daqui
 router.use(authenticateJWT);
 
 // Define a rota POST para criar uma nova despesa
-router.post('/create', ExpenseController.create);
+router.post('/', ExpenseController.create);
 
 // Define a rota GET para obter todas as despesas do usuário
-router.get('/all', ExpenseController.getAll);
+router.get('/', ExpenseController.getAll);
 
-// Outras rotas para CRUD (Create, Read, Update, Delete) de despesas podem ser adicionadas aqui
+// Define a rota GET para obter uma despesa específica por ID
+router.get('/:id', ExpenseController.getById);
 
-export default router; // Exporta o roteador para uso em outros módulos
+// Define a rota PUT para atualizar uma despesa específica por ID
+router.put('/:id', ExpenseController.update);
+
+// Define a rota DELETE para deletar uma despesa específica por ID
+router.delete('/:id', ExpenseController.delete);
+
+export default router;

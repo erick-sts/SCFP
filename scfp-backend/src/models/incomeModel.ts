@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './userModel';
 
 // Define a entidade Income
-// A anotação @Entity() marca a classe como uma entidade que será mapeada para uma tabela no banco de dados
 @Entity()
 export class Income {
     // Define a coluna id como uma chave primária gerada automaticamente
@@ -17,8 +16,11 @@ export class Income {
     @Column()
     description!: string;
 
+    // Define a coluna category como uma string
+    @Column()
+    category!: string;
+
     // Define um relacionamento muitos-para-um com a entidade User
-    // Cada receita está associada a um usuário
     @ManyToOne(() => User, user => user.incomes)
     user!: User; // Associação com o modelo User
 }

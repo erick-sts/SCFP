@@ -4,46 +4,84 @@ import { User } from '../models/userModel';
 
 export class IncomeService {
     // Método para criar uma nova entrada de receita
-    static async create(data: any, userId: number) {
-        // Obtemos o repositório da entidade Income
+    static async create(data: { amount: number, description: string, category: string }, userId: number) {
         const incomeRepository = getRepository(Income);
-        // Obtemos o repositório da entidade User
         const userRepository = getRepository(User);
 
-        // Verificamos se o usuário existe
-        const user = await userRepository.findOne({
-            where: { id: userId } // Usamos um objeto de opções para encontrar o usuário
-        });
+        const user = await userRepository.findOne({ where: { id: userId } });
 
         if (!user) {
-            // Se o usuário não for encontrado, lançamos um erro
             throw new Error('Usuário não encontrado');
         }
 
-        // Criamos uma nova entrada de receita com os dados fornecidos e associamos ao usuário
         const income = incomeRepository.create({ ...data, user });
-        // Salvamos a nova receita no banco de dados
         await incomeRepository.save(income);
 
-        // Retornamos uma resposta de sucesso
         return { status: 201, message: 'Entrada de receita criada com sucesso!' };
     }
 
     // Método para obter todas as receitas de um usuário
     static async getAll(userId: number) {
-        // Obtemos o repositório da entidade Income
         const incomeRepository = getRepository(Income);
 
-        // Buscamos receitas relacionadas ao usuário
         const incomes = await incomeRepository.find({
-            where: {
-                user: { id: userId } // Usamos a associação com User para filtrar as receitas
-            }
+            where: { user: { id: userId } }
         });
 
-        // Retornamos as receitas encontradas
         return incomes;
     }
 
-    // Outros métodos CRUD podem ser adicionados aqui
+    // Método para obter uma receita específica por ID
+    static async getById(incomeId: number, userId: number) {
+        const incomeRepository = getRepository(Income);
+
+        const income = await incomeRepository.findOne({
+            where: { id: incomeId, user: { id: userId } }
+        });
+
+        if (!income) {
+            throw new Error('Receita não encontrada');
+        }
+
+        return income;
+    }
+
+    // Método para atualizar uma receita específica por ID
+    static async update(incomeId: number, data: { amount?: number, description?: string, category?: string }, userId: number) {
+        const incomeRepository = getRepository(Income);
+
+        const income = await incomeRepository.findOne({
+            where: { id: incomeId, user: { id: userId } }
+        });
+
+        if (!income) {
+            throw new Error('Receita não encontrada');
+        }
+
+        // Atualiza os campos da receita com os dados fornecidos
+        income.amount = data.amount ?? income.amount;
+        income.description = data.description ?? income.description;
+        income.category = data.category ?? income.category;
+
+        await incomeRepository.save(income);
+
+        return { status: 200, message: 'Receita atualizada com sucesso!' };
+    }
+
+    // Método para deletar uma receita específica por ID
+    static async delete(incomeId: number, userId: number) {
+        const incomeRepository = getRepository(Income);
+
+        const income = await incomeRepository.findOne({
+            where: { id: incomeId, user: { id: userId } }
+        });
+
+        if (!income) {
+            throw new Error('Receita não encontrada');
+        }
+
+        await incomeRepository.remove(income);
+
+        return { status: 200, message: 'Receita removida com sucesso!' };
+    }
 }

@@ -20,7 +20,6 @@ interface JwtPayload {
 
 // Middleware para autenticação usando JWT
 export const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
-    console.log('JWT_SECRET:', JWT_SECRET); // Log da chave secreta para depuração
 
     // Obtém o cabeçalho de autorização da requisição
     const authHeader = req.headers.authorization;

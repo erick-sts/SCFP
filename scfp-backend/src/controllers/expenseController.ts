@@ -1,50 +1,139 @@
-import { Request, Response } from 'express'; // Importa os tipos Request e Response do Express
-import { getRepository } from 'typeorm'; // Importa a função getRepository do TypeORM para acessar o repositório do banco de dados
-import { Expense } from '../models/expenseModel'; // Importa o modelo de despesa
-import { User } from '../models/userModel'; // Importa o modelo de usuário
+import { Request, Response } from 'express';
+import { ExpenseService } from '../services/expenseService';
 
 export class ExpenseController {
-    // Método estático para criar uma nova despesa
+    // Método para criar uma nova despesa
     static async create(req: Request, res: Response) {
-        const { amount, description } = req.body; // Desestruturação do corpo da requisição para obter o valor e a descrição
-        const userId = req.userId; // Obtém o ID do usuário do middleware de autenticação
+        const { amount, description, category } = req.body;
+        const userIdString = req.userId; // Supondo que `userId` seja uma string
 
-        // Verifica se os campos obrigatórios foram preenchidos
-        if (!amount || !description) {
-            return res.status(400).json({ message: 'O valor e a descrição são obrigatórios.' });
+        if (!userIdString) {
+            return res.status(400).json({ message: 'ID do usuário não fornecido' });
+        }
+
+        const userId = Number(userIdString); // Converte para número
+
+        if (isNaN(userId)) {
+            return res.status(400).json({ message: 'ID do usuário inválido' });
         }
 
         try {
-            // Busca o usuário pelo ID fornecido
-            const user = await getRepository(User).findOne({ where: { id: userId } });
-            if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
-
-            // Cria uma nova instância de despesa com os dados fornecidos
-            const expense = new Expense();
-            expense.amount = amount;
-            expense.description = description;
-            expense.user = user;
-
-            // Salva a despesa no banco de dados
-            await getRepository(Expense).save(expense);
-            return res.status(201).json(expense); // Retorna a despesa criada
+            const response = await ExpenseService.create({ description, amount,  category }, userId);
+            return res.status(response.status).json({ message: response.message });
         } catch (error) {
-            console.error('Erro ao criar despesa:', error); // Log de erro
-            return res.status(500).json({ message: 'Erro ao criar despesa' }); // Retorna uma mensagem de erro em caso de falha
+            console.error('Erro ao criar despesa:', error);
+            return res.status(500).json({ message: 'Erro ao criar despesa' });
         }
     }
 
-    // Método estático para obter todas as despesas de um usuário
+    // Método para obter todas as despesas de um usuário
     static async getAll(req: Request, res: Response) {
-        const userId = req.userId; // Obtém o ID do usuário do middleware de autenticação
+        const userIdString = req.userId; // Supondo que `userId` seja uma string
+
+        if (!userIdString) {
+            return res.status(400).json({ message: 'ID do usuário não fornecido' });
+        }
+
+        const userId = Number(userIdString); // Converte para número
+
+        if (isNaN(userId)) {
+            return res.status(400).json({ message: 'ID do usuário inválido' });
+        }
 
         try {
-            // Busca todas as despesas associadas ao usuário
-            const expenses = await getRepository(Expense).find({ where: { user: { id: userId } } });
-            return res.status(200).json(expenses); // Retorna a lista de despesas
+            const expenses = await ExpenseService.getAll(userId);
+            return res.status(200).json(expenses);
         } catch (error) {
-            console.error('Erro ao buscar despesas:', error); // Log de erro
-            return res.status(500).json({ message: 'Erro ao buscar despesas' }); // Retorna uma mensagem de erro em caso de falha
+            console.error('Erro ao recuperar despesas:', error);
+            return res.status(500).json({ message: 'Erro ao recuperar despesas' });
+        }
+    }
+
+    // Método para obter uma despesa específica por ID
+    static async getById(req: Request, res: Response) {
+        const { id } = req.params; // Extrai o ID da despesa da URL
+        const userIdString = req.userId; // Supondo que `userId` seja uma string
+
+        if (!userIdString) {
+            return res.status(400).json({ message: 'ID do usuário não fornecido' });
+        }
+
+        const userId = Number(userIdString); // Converte para número
+        const expenseId = Number(id); // Converte o ID da despesa para número
+
+        if (isNaN(userId) || isNaN(expenseId)) {
+            return res.status(400).json({ message: 'ID inválido' });
+        }
+
+        try {
+            const expense = await ExpenseService.getById(expenseId, userId);
+            if (expense) {
+                return res.status(200).json(expense);
+            } else {
+                return res.status(404).json({ message: 'Despesa não encontrada' });
+            }
+        } catch (error) {
+            console.error('Erro ao recuperar despesa:', error);
+            return res.status(500).json({ message: 'Erro ao recuperar despesa' });
+        }
+    }
+
+    // Método para atualizar uma despesa específica
+    static async update(req: Request, res: Response) {
+        const { id } = req.params; // Extrai o ID da despesa da URL
+        const data = req.body; // Extrai dados da requisição
+        const userIdString = req.userId; // Supondo que `userId` seja uma string
+
+        if (!userIdString) {
+            return res.status(400).json({ message: 'ID do usuário não fornecido' });
+        }
+
+        const userId = Number(userIdString); // Converte para número
+        const expenseId = Number(id); // Converte o ID da despesa para número
+
+        if (isNaN(userId) || isNaN(expenseId)) {
+            return res.status(400).json({ message: 'ID inválido' });
+        }
+
+        try {
+            const result = await ExpenseService.update(expenseId, data, userId);
+            if (result.affected) {
+                return res.status(200).json({ message: 'Despesa atualizada com sucesso!' });
+            } else {
+                return res.status(404).json({ message: 'Despesa não encontrada' });
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar despesa:', error);
+            return res.status(500).json({ message: 'Erro ao atualizar despesa' });
+        }
+    }
+
+    // Método para deletar uma despesa específica
+    static async delete(req: Request, res: Response) {
+        const { id } = req.params; // Extrai o ID da despesa da URL
+        const userIdString = req.userId; // Supondo que `userId` seja uma string
+
+        if (!userIdString) {
+            return res.status(400).json({ message: 'ID do usuário não fornecido' });
+        }
+
+        const userId = Number(userIdString); // Converte para número
+        const expenseId = Number(id); // Converte o ID da despesa para número
+
+        if (isNaN(userId) || isNaN(expenseId)) {
+            return res.status(400).json({ message: 'ID inválido' });
+        }
+
+        try {
+            const result = await ExpenseService.delete(expenseId, userId);
+            if (result.affected) {
+                return res.status(200).json({ message: 'Despesa deletada com sucesso!' });
+            } else {
+                return res.status(404).json({ message: 'Despesa não encontrada' });
+            }
+        } catch (error) {
+            console.error('Erro ao deletar despesa:', error);
+            return res.status(500).json({ message: 'Erro ao deletar despesa' });
         }
     }
 }

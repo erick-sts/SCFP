@@ -1,61 +1,76 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
-import { Income } from '../models/incomeModel';
-import { User } from '../models/userModel';
+import { IncomeService } from '../services/incomeService';
 
 export class IncomeController {
-    // Método estático para criar uma nova receita
     static async create(req: Request, res: Response) {
-        const { amount, description } = req.body; // Extrai os valores de 'amount' e 'description' do corpo da requisição
-        const userId = req.userId; // Obtém o ID do usuário a partir do middleware de autenticação
+        const { amount, description, category } = req.body;
+        const userId = req.userId as number;
 
-        console.log('Corpo da requisição:', req.body); // Log do corpo da requisição para depuração
-        console.log('ID do usuário da requisição:', userId); // Log do ID do usuário para depuração
-
-        // Verifica se 'amount' e 'description' foram fornecidos
-        if (!amount || !description) {
-            console.log('Valor ou descrição faltando'); // Log para depuração
-            return res.status(400).json({ message: 'Valor e descrição são obrigatórios.' }); // Resposta com erro se algum dos campos estiver faltando
+        if (!amount || !description || !category) {
+            return res.status(400).json({ message: 'Valor, descrição e categoria são obrigatórios.' });
         }
 
         try {
-            // Busca o usuário no banco de dados com base no ID fornecido
-            const user = await getRepository(User).findOne({ where: { id: userId } });
-            if (!user) {
-                console.log('Usuário não encontrado'); // Log para depuração
-                return res.status(404).json({ message: 'Usuário não encontrado' }); // Resposta com erro se o usuário não for encontrado
-            }
-
-            // Cria uma nova instância do modelo Income
-            const income = new Income();
-            income.amount = amount; // Define o valor da receita
-            income.description = description; // Define a descrição da receita
-            income.user = user; // Associa a receita ao usuário
-
-            // Salva a nova receita no banco de dados
-            await getRepository(Income).save(income);
-            console.log('Receita criada:', income); // Log para depuração
-            res.status(201).json(income); // Responde com a receita criada e o status 201 (Criado)
+            const response = await IncomeService.create({ description, amount,  category }, userId);
+            return res.status(response.status).json({ message: response.message });
         } catch (error) {
-            console.log('Erro ao criar receita:', error); // Log do erro para depuração
-            res.status(500).json({ message: 'Erro ao criar receita' }); // Resposta com erro interno do servidor
+            console.error('Erro ao criar receita:', error);
+            return res.status(500).json({ message: 'Erro ao criar receita' });
         }
     }
 
-    // Método estático para obter todas as receitas de um usuário
     static async getAll(req: Request, res: Response) {
-        const userId = req.userId; // Obtém o ID do usuário a partir do middleware de autenticação
-
-        console.log('ID do usuário da requisição:', userId); // Log do ID do usuário para depuração
+        const userId = req.userId as number;
 
         try {
-            // Busca todas as receitas associadas ao usuário
-            const incomes = await getRepository(Income).find({ where: { user: { id: userId } } });
-            console.log('Receitas recuperadas:', incomes); // Log das receitas recuperadas para depuração
-            res.status(200).json(incomes); // Responde com a lista de receitas e o status 200 (OK)
+            const incomes = await IncomeService.getAll(userId);
+            return res.status(200).json(incomes);
         } catch (error) {
-            console.log('Erro ao recuperar receitas:', error); // Log do erro para depuração
-            res.status(500).json({ message: 'Erro ao recuperar receitas' }); // Resposta com erro interno do servidor
+            console.error('Erro ao recuperar receitas:', error);
+            return res.status(500).json({ message: 'Erro ao recuperar receitas' });
+        }
+    }
+
+    // Método para obter uma receita específica por ID
+    static async getById(req: Request, res: Response) {
+        const incomeId = parseInt(req.params.id, 10);
+        const userId = req.userId as number;
+
+        try {
+            const income = await IncomeService.getById(incomeId, userId);
+            return res.status(200).json(income);
+        } catch (error) {
+            console.error('Erro ao recuperar receita:', error);
+            return res.status(404).json({ message: 'Receita não encontrada' });
+        }
+    }
+
+    // Método para atualizar uma receita específica por ID
+    static async update(req: Request, res: Response) {
+        const incomeId = parseInt(req.params.id, 10);
+        const { amount, description, category } = req.body;
+        const userId = req.userId as number;
+
+        try {
+            const response = await IncomeService.update(incomeId, { amount, description, category }, userId);
+            return res.status(response.status).json({ message: response.message });
+        } catch (error) {
+            console.error('Erro ao atualizar receita:', error);
+            return res.status(404).json({ message: 'Receita não encontrada' });
+        }
+    }
+
+    // Método para deletar uma receita específica por ID
+    static async delete(req: Request, res: Response) {
+        const incomeId = parseInt(req.params.id, 10);
+        const userId = req.userId as number;
+
+        try {
+            const response = await IncomeService.delete(incomeId, userId);
+            return res.status(response.status).json({ message: response.message });
+        } catch (error) {
+            console.error('Erro ao remover receita:', error);
+            return res.status(404).json({ message: 'Receita não encontrada' });
         }
     }
 }
