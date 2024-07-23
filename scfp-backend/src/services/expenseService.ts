@@ -1,68 +1,69 @@
+// expenseService.ts
 import { getRepository } from 'typeorm';
 import { Expense } from '../models/expenseModel';
 import { User } from '../models/userModel';
+import { Category } from '../models/categoryModel';
 
 export class ExpenseService {
-    // Método para criar uma nova despesa
-    static async create(data: any, userId: number) {
-        const expenseRepository = getRepository(Expense);
-        const userRepository = getRepository(User);
+  static async create(data: { amount: number, description: string, categoryId: number }, userId: number) {
+    const expenseRepository = getRepository(Expense);
+    const userRepository = getRepository(User);
+    const categoryRepository = getRepository(Category);
 
-        const user = await userRepository.findOne({ where: { id: userId } });
+    const user = await userRepository.findOne({ where: { id: userId } });
+    const category = await categoryRepository.findOne({ where: { id: data.categoryId } });
 
-        if (!user) {
-            throw new Error('Usuário não encontrado');
-        }
-
-        const expense = expenseRepository.create({ ...data, user });
-        await expenseRepository.save(expense);
-
-        return { status: 201, message: 'Entrada de despesa criada com sucesso!' };
+    if (!user || !category) {
+      throw new Error('Usuário ou categoria não encontrado');
     }
 
-    // Método para obter todas as despesas de um usuário
-    static async getAll(userId: number) {
-        const expenseRepository = getRepository(Expense);
+    const expense = expenseRepository.create({ ...data, user, category });
+    await expenseRepository.save(expense);
 
-        const expenses = await expenseRepository.find({
-            where: { user: { id: userId } }
-        });
+    return { status: 201, message: 'Despesa criada com sucesso!' };
+  }
 
-        return expenses;
+  static async getAll(userId: number) {
+    const expenseRepository = getRepository(Expense);
+
+    const expenses = await expenseRepository.find({ where: { user: { id: userId } }, relations: ['category'] });
+    return expenses;
+  }
+
+  static async getById(id: number, userId: number) {
+    const expenseRepository = getRepository(Expense);
+
+    const expense = await expenseRepository.findOne({ where: { id, user: { id: userId } }, relations: ['category'] });
+    if (!expense) {
+      throw new Error('Despesa não encontrada');
+    }
+    return expense;
+  }
+
+  static async update(id: number, data: Partial<Expense>, userId: number) {
+    const expenseRepository = getRepository(Expense);
+
+    let expense = await expenseRepository.findOne({ where: { id, user: { id: userId } }, relations: ['category'] });
+    if (!expense) {
+      throw new Error('Despesa não encontrada');
     }
 
-    // Método para obter uma despesa específica por ID
-    static async getById(id: number, userId: number) {
-        const expenseRepository = getRepository(Expense);
+    expense = { ...expense, ...data };
+    await expenseRepository.save(expense);
 
-        const expense = await expenseRepository.findOne({
-            where: { id, user: { id: userId } }
-        });
+    return { status: 200, message: 'Despesa atualizada com sucesso!' };
+  }
 
-        return expense;
+  static async delete(id: number, userId: number) {
+    const expenseRepository = getRepository(Expense);
+
+    const expense = await expenseRepository.findOne({ where: { id, user: { id: userId } } });
+    if (!expense) {
+      throw new Error('Despesa não encontrada');
     }
 
-    // Método para atualizar uma despesa específica
-    static async update(id: number, data: any, userId: number) {
-        const expenseRepository = getRepository(Expense);
+    await expenseRepository.remove(expense);
 
-        const result = await expenseRepository.update(
-            { id, user: { id: userId } },
-            data
-        );
-
-        return result;
-    }
-
-    // Método para deletar uma despesa específica
-    static async delete(id: number, userId: number) {
-        const expenseRepository = getRepository(Expense);
-
-        const result = await expenseRepository.delete({
-            id,
-            user: { id: userId }
-        });
-
-        return result;
-    }
+    return { status: 200, message: 'Despesa removida com sucesso!' };
+  }
 }

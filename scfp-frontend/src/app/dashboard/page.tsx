@@ -1,178 +1,94 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { User } from '../types';
-import { getIncomes, getExpenses, addIncome, addExpense } from '../services/fincancesService';
-import { fetchUserData } from '../utils/authMiddleware'; 
-import Chart from '../components/chart';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../utils/authMiddleware';
+import TransactionForm from '../components/transactionForm/TransactionForm';
+import TransactionList from '../components/transactionList/TransactionList';
+import SidebarMenu from '../components/sidebarMenu/SidebarMenu';
+import Chart from '../components/chart/Chart';
 import styles from './page.module.css';
-
-// Definir o tipo de dados do gráfico
-interface ChartData {
-  labels: string[];
-  datasets: {
-    label: string;
-    data: number[];
-    fill: boolean;
-    borderColor: string;
-    backgroundColor?: string[];
-  }[];
-}
-
-// Lista de categorias para receitas e despesas
-const incomeCategories = ['Salário', 'Freelance', 'Investimentos', 'Outros'];
-const expenseCategories = ['Aluguel', 'Alimentação', 'Transporte', 'Entretenimento', 'Outros'];
+import { getIncomes, getExpenses, addIncome, addExpense } from '../services/fincancesService';
 
 const DashboardPage: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [description, setDescription] = useState('');
-  const [value, setValue] = useState('');
-  const [type, setType] = useState('income');
-  const [category, setCategory] = useState('');
-  const [incomes, setIncomes] = useState([]);
-  const [expenses, setExpenses] = useState([]);
-  const [chartData, setChartData] = useState<ChartData>({
-    labels: [],
-    datasets: []
-  });
+  const { isAuthenticated, loading } = useAuth();
+  const [incomes, setIncomes] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Use effect for data fetching
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      fetchUserData(token).then(userData => {
-        setUser(userData);
-        // Fetch incomes and expenses here
-        Promise.all([getIncomes(), getExpenses()]).then(([incomesData, expensesData]) => {
-          setIncomes(incomesData);
-          setExpenses(expensesData);
+    if (isAuthenticated) {
+      const fetchData = async () => {
+        try {
+          const incomeData = await getIncomes();
+          const expenseData = await getExpenses();
+          setIncomes(Array.isArray(incomeData) ? incomeData : []);
+          setExpenses(Array.isArray(expenseData) ? expenseData : []);
+        } catch (error) {
+          console.log("Erro ao buscar dados", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
-          // Prepare chart data
-          const incomeTotal = incomesData.reduce((total: number, income: any) => total + parseFloat(income.amount), 0);
-          const expenseTotal = expensesData.reduce((total: number, expense: any) => total + parseFloat(expense.amount), 0);
+      fetchData();
+    }
+  }, [isAuthenticated]);
 
-          setChartData({
-            labels: ['Total Receitas', 'Total Despesas'],
-            datasets: [
-              {
-                label: 'Valores',
-                data: [incomeTotal, expenseTotal],
-                fill: false,
-                borderColor: 'blue',
-                backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)']
-              }
-            ]
-          });
-        });
-      }).catch(error => {
-        console.error('Erro na autenticação:', error);
-        window.location.href = '/login';
-      });
-    } else {
-      alert('Você precisa logar');
+  // Handle redirection
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
       window.location.href = '/login';
     }
-  }, []);
+  }, [loading, isAuthenticated]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const data = { description, amount: value, category };
-
+  const handleAddTransaction = async (description: string, value: number, category: string, type: 'income' | 'expense') => {
     try {
-        if (type === 'income') {
-            await addIncome(data);
-        } else if (type === 'expense') {
-            await addExpense(data);
-        }
-        setDescription('');
-        setValue('');
-        setCategory(''); // Limpa o campo de categoria após o envio
-
-        // Recarregar os dados após adição
+      if (type === 'income') {
+        await addIncome({ description, amount: value, category });
         const updatedIncomes = await getIncomes();
+        setIncomes(Array.isArray(updatedIncomes) ? updatedIncomes : []);
+      } else if (type === 'expense') {
+        await addExpense({ description, amount: value, category });
         const updatedExpenses = await getExpenses();
-        setIncomes(updatedIncomes);
-        setExpenses(updatedExpenses);
-
-        const incomeTotal = updatedIncomes.reduce((total: number, income: any) => total + parseFloat(income.amount), 0);
-        const expenseTotal = updatedExpenses.reduce((total: number, expense: any) => total + parseFloat(expense.amount), 0);
-
-        setChartData({
-          labels: ['Total Receitas', 'Total Despesas'],
-          datasets: [
-            {
-              label: 'Valores',
-              data: [incomeTotal, expenseTotal],
-              fill: false,
-              borderColor: 'blue',
-              backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)']
-            }
-          ]
-        });
+        setExpenses(Array.isArray(updatedExpenses) ? updatedExpenses : []);
+      }
     } catch (error) {
-        console.error('Erro ao adicionar registro:', error);
+      console.error(`Erro ao adicionar ${type === 'income' ? 'receita' : 'despesa'}:`, error);
     }
   };
 
-  const categories = type === 'income' ? incomeCategories : expenseCategories;
+  const chartData = {
+    labels: ['Despesas Fixas', 'Despesas Variáveis', 'Receitas Fixas', 'Receitas Variáveis'],
+    datasets: [
+      {
+        label: 'Despesas e Receitas',
+        data: [
+          expenses.filter(e => e.category === 'fixed').reduce((acc, curr) => acc + curr.amount, 0),
+          expenses.filter(e => e.category === 'variable').reduce((acc, curr) => acc + curr.amount, 0),
+          incomes.filter(i => i.category === 'fixed').reduce((acc, curr) => acc + curr.amount, 0),
+          incomes.filter(i => i.category === 'variable').reduce((acc, curr) => acc + curr.amount, 0),
+        ],
+        backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+        borderWidth: 1,
+      },
+    ],
+  };
 
-  if (!user) {
-    return <div className={styles.container}>Carregando...</div>;
+  if (loading || !isAuthenticated) {
+    return <div>Carregando...</div>;
   }
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <img src={user.photoUrl} alt="User Photo" className={styles.userPhoto} />
-        <h1 className={styles.userName}>{user.name}</h1>
-      </header>
-      <div className={styles.graphContainer}>
-        <Chart data={chartData} /> {/* Usa o componente Chart */}
+    <div>
+      <SidebarMenu />
+      <div style={{ marginLeft: '250px', padding: '20px' }}>
+        <h1>Dashboard</h1>
+        <Chart data={chartData} />
+        <TransactionForm onAddTransaction={handleAddTransaction} />
+        <TransactionList incomes={incomes} expenses={expenses} />
       </div>
-      <form className={styles.formContainer} onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Descrição"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-          className={styles.input}
-        />
-        <input
-          type="number"
-          placeholder="Valor"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          required
-          className={styles.input}
-        />
-        <div className={styles.radioContainer}>
-          <label>
-            <input
-              type="radio"
-              value="income"
-              checked={type === 'income'}
-              onChange={() => setType('income')}
-            />
-            Receita
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="expense"
-              checked={type === 'expense'}
-              onChange={() => setType('expense')}
-            />
-            Despesa
-          </label>
-        </div>
-        <select value={category} onChange={(e) => setCategory(e.target.value)} required className={styles.input}>
-          <option value="">Selecione uma categoria</option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-        <button type="submit" className={styles.submitButton}>Adicionar</button>
-      </form>
     </div>
   );
 };

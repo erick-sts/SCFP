@@ -1,0 +1,17 @@
+.sidebarMenu {
+    padding: 20px;
+  }
+  
+  .sidebarMenu button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .sidebarMenu button:hover {
+    background-color: #c82333;
+  }
+  

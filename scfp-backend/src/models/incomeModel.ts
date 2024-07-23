@@ -1,26 +1,21 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from './userModel';
+import { User } from './userModel';  // Importa o modelo User
+import { Category } from './categoryModel';  // Importa o modelo Category
 
-// Define a entidade Income
 @Entity()
 export class Income {
-    // Define a coluna id como uma chave primária gerada automaticamente
-    @PrimaryGeneratedColumn()
-    id!: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    // Define a coluna amount como um número decimal com precisão de 10 e escala de 2 (ex: 12345678.90)
-    @Column('decimal', { precision: 10, scale: 2 })
-    amount!: number;
+  @Column()
+  description!: string;
 
-    // Define a coluna description como uma string
-    @Column()
-    description!: string;
+  @Column('decimal')
+  value!: number;
 
-    // Define a coluna category como uma string
-    @Column()
-    category!: string;
+  @ManyToOne(() => Category, (category) => category.incomes)
+  category!: Category;
 
-    // Define um relacionamento muitos-para-um com a entidade User
-    @ManyToOne(() => User, user => user.incomes)
-    user!: User; // Associação com o modelo User
+  @ManyToOne(() => User, (user) => user.incomes)
+  user!: User;  // Certifique-se de que a relação com User está definida corretamente
 }

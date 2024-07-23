@@ -1,87 +1,69 @@
+// incomeService.ts
 import { getRepository } from 'typeorm';
 import { Income } from '../models/incomeModel';
 import { User } from '../models/userModel';
+import { Category } from '../models/categoryModel';
 
 export class IncomeService {
-    // Método para criar uma nova entrada de receita
-    static async create(data: { amount: number, description: string, category: string }, userId: number) {
-        const incomeRepository = getRepository(Income);
-        const userRepository = getRepository(User);
+  static async create(data: { amount: number, description: string, categoryId: number }, userId: number) {
+    const incomeRepository = getRepository(Income);
+    const userRepository = getRepository(User);
+    const categoryRepository = getRepository(Category);
 
-        const user = await userRepository.findOne({ where: { id: userId } });
+    const user = await userRepository.findOne({ where: { id: userId } });
+    const category = await categoryRepository.findOne({ where: { id: data.categoryId } });
 
-        if (!user) {
-            throw new Error('Usuário não encontrado');
-        }
-
-        const income = incomeRepository.create({ ...data, user });
-        await incomeRepository.save(income);
-
-        return { status: 201, message: 'Entrada de receita criada com sucesso!' };
+    if (!user || !category) {
+      throw new Error('Usuário ou categoria não encontrado');
     }
 
-    // Método para obter todas as receitas de um usuário
-    static async getAll(userId: number) {
-        const incomeRepository = getRepository(Income);
+    const income = incomeRepository.create({ ...data, user, category });
+    await incomeRepository.save(income);
 
-        const incomes = await incomeRepository.find({
-            where: { user: { id: userId } }
-        });
+    return { status: 201, message: 'Receita criada com sucesso!' };
+  }
 
-        return incomes;
+  static async getAll(userId: number) {
+    const incomeRepository = getRepository(Income);
+
+    const incomes = await incomeRepository.find({ where: { user: { id: userId } }, relations: ['category'] });
+    return incomes;
+  }
+
+  static async getById(id: number, userId: number) {
+    const incomeRepository = getRepository(Income);
+
+    const income = await incomeRepository.findOne({ where: { id, user: { id: userId } }, relations: ['category'] });
+    if (!income) {
+      throw new Error('Receita não encontrada');
+    }
+    return income;
+  }
+
+  static async update(id: number, data: Partial<Income>, userId: number) {
+    const incomeRepository = getRepository(Income);
+
+    let income = await incomeRepository.findOne({ where: { id, user: { id: userId } }, relations: ['category'] });
+    if (!income) {
+      throw new Error('Receita não encontrada');
     }
 
-    // Método para obter uma receita específica por ID
-    static async getById(incomeId: number, userId: number) {
-        const incomeRepository = getRepository(Income);
+    income = { ...income, ...data };
+    await incomeRepository.save(income);
 
-        const income = await incomeRepository.findOne({
-            where: { id: incomeId, user: { id: userId } }
-        });
+    return { status: 200, message: 'Receita atualizada com sucesso!' };
+  }
 
-        if (!income) {
-            throw new Error('Receita não encontrada');
-        }
+  static async delete(id: number, userId: number) {
+    const incomeRepository = getRepository(Income);
 
-        return income;
+    const income = await incomeRepository.findOne({ where: { id, user: { id: userId } } });
+    if (!income) {
+      throw new Error('Receita não encontrada');
     }
 
-    // Método para atualizar uma receita específica por ID
-    static async update(incomeId: number, data: { amount?: number, description?: string, category?: string }, userId: number) {
-        const incomeRepository = getRepository(Income);
+    await incomeRepository.remove(income);
 
-        const income = await incomeRepository.findOne({
-            where: { id: incomeId, user: { id: userId } }
-        });
-
-        if (!income) {
-            throw new Error('Receita não encontrada');
-        }
-
-        // Atualiza os campos da receita com os dados fornecidos
-        income.amount = data.amount ?? income.amount;
-        income.description = data.description ?? income.description;
-        income.category = data.category ?? income.category;
-
-        await incomeRepository.save(income);
-
-        return { status: 200, message: 'Receita atualizada com sucesso!' };
-    }
-
-    // Método para deletar uma receita específica por ID
-    static async delete(incomeId: number, userId: number) {
-        const incomeRepository = getRepository(Income);
-
-        const income = await incomeRepository.findOne({
-            where: { id: incomeId, user: { id: userId } }
-        });
-
-        if (!income) {
-            throw new Error('Receita não encontrada');
-        }
-
-        await incomeRepository.remove(income);
-
-        return { status: 200, message: 'Receita removida com sucesso!' };
-    }
+    return { status: 200, message: 'Receita removida com sucesso!' };
+  }
 }

@@ -8,6 +8,7 @@ import userRoute from './routes/userRoute'
 import authRoutes from './routes/authRoute'; 
 import incomeRoutes from './routes/incomeRoute'; 
 import expenseRoutes from './routes/expenseRoute'; 
+import categoryRoute from './routes/categoryRoute';
 
 // Configuração de variáveis de ambiente
 dotenv.config(); 
@@ -29,6 +30,7 @@ app.use('/api/user', userRoute)
 app.use('/api/auth', authRoutes); 
 app.use('/api/income', incomeRoutes); 
 app.use('/api/expense', expenseRoutes); 
+app.use('/api/category', categoryRoute);
 
 // Conexão com o banco de dados
 createConnection().then(() => {
