@@ -1,48 +1,46 @@
-// src/app/components/transactionForm/TransactionForm.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './TransactionForm.module.css';
+import { getCategories } from '../../services/fincancesService';
 
 interface TransactionFormProps {
-  onAddTransaction: (description: string, value: number, category: string, type: 'income' | 'expense') => void;
+  onAddTransaction: (description: string, value: number, categoryId: number, type: 'income' | 'expense') => void;
+  userId: number;
 }
 
-const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction }) => {
+const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, userId }) => {
   const [description, setDescription] = useState('');
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState<number>(0);
+  const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
   const [type, setType] = useState<'income' | 'expense'>('income');
-  const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState<{ id: number; name: string; transactionType: 'income' | 'expense' }[]>([]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoryData = await getCategories();
+        setCategories(Array.isArray(categoryData) ? categoryData : []);
+      } catch (error) {
+        console.error('Erro ao buscar categorias:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const numericValue = parseFloat(value);
-    
-    try {
-      await onAddTransaction(description, numericValue, category, type);
+    if (categoryId !== undefined) {
+      onAddTransaction(description, value, categoryId, type);
       setDescription('');
-      setValue('');
-      setCategory('');
-    } catch (error) {
-      console.error('Erro ao adicionar transação:', error);
+      setValue(0);
+      setCategoryId(undefined);
     }
   };
 
   return (
-    <form className={styles.transactionForm} onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Descrição"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        required
-      />
-      <input
-        type="number"
-        placeholder="Valor"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        required
-      />
-      <div>
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <h2>Adicionar</h2>
+      <div className={styles.radio}>
         <label>
           <input
             type="radio"
@@ -62,11 +60,36 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction }) =
           Despesa
         </label>
       </div>
-      <select value={category} onChange={(e) => setCategory(e.target.value)} required>
-        <option value="">Selecione uma categoria</option>
-        {/* Adicione opções de categorias conforme necessário */}
+      <select
+        value={categoryId || ''}
+        onChange={(e) => setCategoryId(Number(e.target.value))}
+        className={styles.input}
+        required
+      >
+        <option value="">Selecione a Categoria</option>
+        {categories.filter(c => c.transactionType === type).map((cat) => (
+          <option key={cat.id} value={cat.id}>{cat.name}</option>
+        ))}
       </select>
-      <button type="submit">Adicionar</button>
+      <input
+        type="text"
+        placeholder="Descrição"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className={styles.input}
+        required
+      />
+      <input
+        type="number"
+        placeholder="Valor"
+        value={value}
+        onChange={(e) => setValue(Number(e.target.value))}
+        className={`${styles.input} ${styles.numberInput}`}
+        required
+      />
+
+
+      <button type="submit" className={styles.button}>Adicionar</button>
     </form>
   );
 };

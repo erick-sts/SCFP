@@ -1,17 +1,56 @@
 .sidebarMenu {
-    padding: 20px;
-  }
-  
-  .sidebarMenu button {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .sidebarMenu button:hover {
-    background-color: #c82333;
-  }
-  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 15vh;
+  background-color: #f4f4f4;
+  border-bottom: 1px solid #ddd;
+  padding: 0 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.logo img {
+  width: 100px;
+  height: auto;
+  border-radius: 20px;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+}
+
+.userInfo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  background-color: blue;
+}
+
+.username {
+  font-size: 14px;
+  font-weight: bold;
+  margin-right: 20px;
+}
+
+.logoutButton {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logoutButton:hover {
+  background-color: #e60000;
+}

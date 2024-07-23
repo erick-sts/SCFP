@@ -1,18 +1,80 @@
 .transactionList {
-    margin-top: 20px;
-  }
-  
-  .transactionList h2 {
-    margin-bottom: 10px;
-  }
-  
-  .transactionList ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .transactionList li {
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-  }
-  
+  max-width: 800px;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column; /* Muda a direção do flex para coluna */
+  align-items: center; /* Alinha os itens no centro horizontalmente */
+}
+
+.transactionList h2 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center; /* Garante que o texto do título esteja centralizado */
+  width: 100%; /* Garante que o título ocupe toda a largura disponível */
+}
+
+.columns {
+  display: flex;
+  justify-content: space-between;
+  width: 100%; /* Garante que as colunas ocupem toda a largura disponível */
+}
+
+.column {
+  width: 48%; /* Ajuste a largura conforme necessário */
+}
+
+.column h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center; /* Garante que o título da coluna esteja centralizado */
+}
+
+.column ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0; /* Remove a margem para garantir que a lista ocupe toda a largura da coluna */
+}
+
+.column li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  font-size: 1rem;
+  color: #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.column li:last-child {
+  border-bottom: none;
+}
+
+.income {
+  background-color: #d4edda; /* Cor de fundo verde claro para receitas */
+}
+
+.expense {
+  background-color: #f8d7da; /* Cor de fundo vermelho claro para despesas */
+}
+
+.icons {
+  display: flex;
+  gap: 10px;
+}
+
+.icon {
+  cursor: pointer;
+  color: #303030; /* Cor dos ícones */
+  margin: 5px;
+}
+
+.icon:hover {
+  color: #696969; /* Cor dos ícones ao passar o mouse */
+}

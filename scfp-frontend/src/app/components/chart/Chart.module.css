@@ -1,7 +1,7 @@
 .chartContainer {
-    margin-top: 20px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
+  max-width: 1000px; 
+  width: 100%; 
+  margin-left: auto;
+  margin-right: auto;
+  height: 400px; /* Ajuste a altura conforme necessário */
+}
