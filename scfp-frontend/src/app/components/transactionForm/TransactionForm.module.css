@@ -1,5 +1,3 @@
-/* TransactionForm.module.css */
-
 .form {
   max-width: 500px;
   padding: 20px;
@@ -37,6 +35,14 @@
   width: 100%;
   /* Ajustado para preencher o contêiner */
   margin-top: 10px;
+}
+
+.button:hover {
+  background-color: #1e5a1b; 
+}
+
+.button:active {
+  background-color: #044d01;
 }
 
 .radio label {

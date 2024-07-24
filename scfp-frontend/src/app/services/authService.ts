@@ -16,7 +16,7 @@ export const login = async (email: string, password: string) => {
         'Content-Type': 'application/json',
       },
     });
-    localStorage.setItem('authToken', response.data.token); // Salvando o token com 'authToken'
+    localStorage.setItem('authToken', response.data.token);
     console.log("Token:", response.data.token);
     return response.data;
   } catch (error) {

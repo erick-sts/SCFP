@@ -1,25 +1,29 @@
 import React from 'react';
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Importa ícones de edição e exclusão
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import styles from './TransactionList.module.css';
 
 interface Transaction {
+  id: number;
   description: string;
   value: number;
   category: {
     name: string;
-    color: string; // Assume que cada categoria pode ter uma cor associada
+    color: string;
   };
+  type: 'income' | 'expense';
 }
 
 interface TransactionListProps {
   incomes: Transaction[];
   expenses: Transaction[];
+  onDelete: (id: number, type: 'income' | 'expense') => void;
+  onEdit: (transaction: Transaction) => void; // Adicione o onEdit aqui
 }
 
-const TransactionList: React.FC<TransactionListProps> = ({ incomes, expenses }) => {
-  const transactions = [
-    ...incomes.map((transaction) => ({ ...transaction, type: 'income' })),
-    ...expenses.map((transaction) => ({ ...transaction, type: 'expense' })),
+const TransactionList: React.FC<TransactionListProps> = ({ incomes, expenses, onDelete, onEdit }) => {
+  const transactions: Transaction[] = [
+    ...incomes.map((transaction) => ({ ...transaction, type: 'income' as 'income' })),
+    ...expenses.map((transaction) => ({ ...transaction, type: 'expense' as 'expense' })),
   ];
 
   return (
@@ -31,12 +35,20 @@ const TransactionList: React.FC<TransactionListProps> = ({ incomes, expenses }) 
           <ul>
             {transactions
               .filter((transaction) => transaction.type === 'income')
-              .map((transaction, index) => (
-                <li key={index} className={styles.income}>
+              .map((transaction) => (
+                <li key={transaction.id} className={styles.income}>
                   {transaction.description} | {"R$ " + Number(transaction.value).toFixed(2)} | ({transaction.category.name})
                   <div className={styles.icons}>
-                    <FaEdit className={styles.icon} title="Editar" />
-                    <FaTrash className={styles.icon} title="Excluir" />
+                    <FaEdit
+                      className={styles.icon}
+                      title="Editar"
+                      onClick={() => onEdit(transaction)} // Passa a transação para a função onEdit
+                    />
+                    <FaTrash
+                      className={styles.icon}
+                      title="Excluir"
+                      onClick={() => onDelete(transaction.id, 'income')}
+                    />
                   </div>
                 </li>
               ))}
@@ -47,12 +59,20 @@ const TransactionList: React.FC<TransactionListProps> = ({ incomes, expenses }) 
           <ul>
             {transactions
               .filter((transaction) => transaction.type === 'expense')
-              .map((transaction, index) => (
-                <li key={index} className={styles.expense}>
+              .map((transaction) => (
+                <li key={transaction.id} className={styles.expense}>
                   {transaction.description} | {"R$ " + Number(transaction.value).toFixed(2)} | ({transaction.category.name})
                   <div className={styles.icons}>
-                    <FaEdit className={styles.icon} title="Editar" />
-                    <FaTrash className={styles.icon} title="Excluir" />
+                    <FaEdit
+                      className={styles.icon}
+                      title="Editar"
+                      onClick={() => onEdit(transaction)} // Passa a transação para a função onEdit
+                    />
+                    <FaTrash
+                      className={styles.icon}
+                      title="Excluir"
+                      onClick={() => onDelete(transaction.id, 'expense')}
+                    />
                   </div>
                 </li>
               ))}

@@ -1,17 +1,28 @@
+//controlzzzz
+
+
 import React, { useState, useEffect } from 'react';
 import styles from './TransactionForm.module.css';
 import { getCategories } from '../../services/fincancesService';
 
-interface TransactionFormProps {
+export interface TransactionFormProps {
   onAddTransaction: (description: string, value: number, categoryId: number, type: 'income' | 'expense') => void;
+  onEditTransaction?: (id: number, description: string, value: number, categoryId: number, type: 'income' | 'expense') => void;
   userId: number;
+  transactionToEdit?: { // Permitir que seja null
+    id: number;
+    description: string;
+    value: number;
+    categoryId: number;
+    type: 'income' | 'expense';
+  } | null; 
 }
 
-const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, userId }) => {
-  const [description, setDescription] = useState('');
-  const [value, setValue] = useState<number>(0);
-  const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
-  const [type, setType] = useState<'income' | 'expense'>('income');
+const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, onEditTransaction, userId, transactionToEdit }) => {
+  const [description, setDescription] = useState(transactionToEdit?.description || '');
+  const [value, setValue] = useState<number>(transactionToEdit?.value || 0);
+  const [categoryId, setCategoryId] = useState<number | undefined>(transactionToEdit?.categoryId);
+  const [type, setType] = useState<'income' | 'expense'>(transactionToEdit?.type || 'income');
   const [categories, setCategories] = useState<{ id: number; name: string; transactionType: 'income' | 'expense' }[]>([]);
 
   useEffect(() => {
@@ -30,7 +41,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, use
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (categoryId !== undefined) {
-      onAddTransaction(description, value, categoryId, type);
+      if (transactionToEdit) {
+        onEditTransaction?.(transactionToEdit.id, description, value, categoryId, type);
+      } else {
+        onAddTransaction(description, value, categoryId, type);
+      }
       setDescription('');
       setValue(0);
       setCategoryId(undefined);
@@ -39,7 +54,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, use
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <h2>Adicionar</h2>
+      <h2>{transactionToEdit ? 'Editar' : 'Adicionar'}</h2>
       <div className={styles.radio}>
         <label>
           <input
@@ -87,9 +102,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onAddTransaction, use
         className={`${styles.input} ${styles.numberInput}`}
         required
       />
-
-
-      <button type="submit" className={styles.button}>Adicionar</button>
+      <button type="submit" className={styles.button}>{transactionToEdit ? 'Salvar Alterações' : 'Adicionar'}</button>
     </form>
   );
 };

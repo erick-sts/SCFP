@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { verify } from 'crypto';
 
 const API_BASE_URL = 'http://localhost:5000/api/user';
 
@@ -25,3 +26,5 @@ export const register = async (name: string, email: string, password: string, ph
         }
     }
 };
+
+

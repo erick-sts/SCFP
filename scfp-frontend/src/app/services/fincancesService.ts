@@ -1,3 +1,5 @@
+//controlzzzz
+
 import axios from 'axios';
 
 // Base URL para a API
@@ -5,9 +7,7 @@ const API_BASE_URL = 'http://localhost:5000/api';
 
 // Função para obter o token do localStorage
 const getAuthToken = () => {
-  const token = localStorage.getItem('authToken'); // Ajustado para 'authToken'
-  console.log('Token:', token); // Verifique se o token está correto
-  return token;
+  return localStorage.getItem('authToken'); // Ajustado para 'authToken'
 };
 
 // Criação da instância do axios com configuração base
@@ -19,15 +19,18 @@ const axiosInstance = axios.create({
 });
 
 // Interceptor para adicionar o token ao cabeçalho das requisições
-axiosInstance.interceptors.request.use(config => {
-  const token = getAuthToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+axiosInstance.interceptors.request.use(
+  config => {
+    const token = getAuthToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
   }
-  return config;
-}, error => {
-  return Promise.reject(error);
-});
+);
 
 // Funções para operações com a API
 export const getIncomes = async (userId: number) => {
@@ -62,12 +65,45 @@ export const addIncome = async (income: { description: string; amount: number; c
   }
 };
 
-
-export const addExpense = async (expense: { description: string; amount: number; categoryId: number; userId: number }) => { // Alterado para categoryId
+export const addExpense = async (expense: { description: string; amount: number; categoryId: number; userId: number }) => {
   try {
     await axiosInstance.post('/expense', expense);
   } catch (error) {
     console.error('Erro ao adicionar despesa:', error);
+  }
+};
+
+
+export const updateIncome = async (id: number, data: { description?: string; amount?: number; categoryId?: number; }) => {
+  try {
+    await axiosInstance.put(`/income/${id}`, data);
+  } catch (error) {
+    console.error('Erro ao atualizar receita:', error);
+  }
+};
+
+export const updateExpense = async (id: number, data: { description?: string; amount?: number; categoryId?: number; }) => {
+  try {
+    await axiosInstance.put(`/expense/${id}`, data);
+  } catch (error) {
+    console.error('Erro ao atualizar despesa:', error);
+  }
+};
+
+
+export const deleteIncome = async (id: number) => {
+  try {
+    await axiosInstance.delete(`/income/${id}`);
+  } catch (error) {
+    console.error('Erro ao excluir receita:', error);
+  }
+};
+
+export const deleteExpense = async (id: number) => {
+  try {
+    await axiosInstance.delete(`/expense/${id}`);
+  } catch (error) {
+    console.error('Erro ao excluir despesa:', error);
   }
 };
 
