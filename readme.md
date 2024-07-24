@@ -47,7 +47,9 @@ git clone https://github.com/erick-sts/SCFP.git
 Navegue até o diretório do projeto:
 
 ```bash
-cd SCFP
+cd scfp-backend
+#e, ou
+cd scfp-frontend
 ```
 Instale as dependências:
 
