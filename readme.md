@@ -1,39 +1,39 @@
-### 💲 SCFP - Sistema de Controle Financeiro Pessoal 🚀
-## Descrição
+# 💲 SCFP - Sistema de Controle Financeiro Pessoal 🚀
+### Descrição
 
 O SCFP é um Sistema de Controle Financeiro Pessoal desenvolvido para ajudar usuários a gerenciar suas receitas e despesas de forma eficiente. O sistema permite a adição, edição e exclusão de transações financeiras, categorização de despesas e receitas, e visualização de gráficos para análise financeira.
 
 ## Funcionalidades
 
-# Cadastro e Login: 
+### Cadastro e Login: 
 Permite aos usuários se cadastrarem e fazerem login para acessar suas informações financeiras.
 
-# Gerenciamento de Transações: 
+### Gerenciamento de Transações: 
 Adiciona, edita e exclui receitas e despesas.
 
-# Categorias 
+### Categorias 
 Personalizadas: Define categorias para receitas e despesas.
 
-# Gráficos: 
+### Gráficos: 
 Visualiza gráficos para análise das finanças pessoais.
 
-# Autenticação Segura: 
+### Autenticação Segura: 
 Utiliza JWT para autenticação e segurança.
 
-# Tecnologias Utilizadas
+### Tecnologias Utilizadas
 Frontend: React, Next.js, CSS Modules
 
-# Backend: 
+### Backend: 
 Node.js, Express
-# Banco de Dados: 
+### Banco de Dados: 
 MySQL (XAMMP)
 
-# Bibliotecas e Ferramentas:
+### Bibliotecas e Ferramentas:
 Axios, Chart.js, etc.
 
 
 ## Instalação
-# Requisitos
+### Requisitos
 
 Node.js (>= 14.x)
 npm (>= 6.x) ou yarn
