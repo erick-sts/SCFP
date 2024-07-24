@@ -1,11 +1,10 @@
-// expenseService.ts
 import { getRepository } from 'typeorm';
 import { Expense } from '../models/expenseModel';
 import { User } from '../models/userModel';
 import { Category } from '../models/categoryModel';
 
 export class ExpenseService {
-  static async create(data: { amount: number, description: string, categoryId: number }, userId: number) {
+  static async create(data: { description: string, amount: number, categoryId: number }, userId: number) {
     const expenseRepository = getRepository(Expense);
     const userRepository = getRepository(User);
     const categoryRepository = getRepository(Category);
@@ -17,7 +16,13 @@ export class ExpenseService {
       throw new Error('Usuário ou categoria não encontrado');
     }
 
-    const expense = expenseRepository.create({ ...data, user, category });
+    const expense = expenseRepository.create({ 
+      description: data.description, 
+      value: data.amount,
+      category, 
+      user 
+    });
+    console.log(expense.value)
     await expenseRepository.save(expense);
 
     return { status: 201, message: 'Despesa criada com sucesso!' };
@@ -25,14 +30,12 @@ export class ExpenseService {
 
   static async getAll(userId: number) {
     const expenseRepository = getRepository(Expense);
-
     const expenses = await expenseRepository.find({ where: { user: { id: userId } }, relations: ['category'] });
     return expenses;
   }
 
   static async getById(id: number, userId: number) {
     const expenseRepository = getRepository(Expense);
-
     const expense = await expenseRepository.findOne({ where: { id, user: { id: userId } }, relations: ['category'] });
     if (!expense) {
       throw new Error('Despesa não encontrada');
@@ -40,15 +43,30 @@ export class ExpenseService {
     return expense;
   }
 
-  static async update(id: number, data: Partial<Expense>, userId: number) {
+  static async update(id: number, data: Partial<{ description: string, amount: number, categoryId: number }>, userId: number) {
     const expenseRepository = getRepository(Expense);
+    const categoryRepository = getRepository(Category);
 
     let expense = await expenseRepository.findOne({ where: { id, user: { id: userId } }, relations: ['category'] });
     if (!expense) {
       throw new Error('Despesa não encontrada');
     }
 
-    expense = { ...expense, ...data };
+    // Atualizar os campos da despesa
+    if (data.description !== undefined) {
+      expense.description = data.description;
+    }
+    if (data.amount !== undefined) {
+      expense.value = data.amount;
+    }
+    if (data.categoryId !== undefined) {
+      const category = await categoryRepository.findOne({ where: { id: data.categoryId } });
+      if (!category) {
+        throw new Error('Categoria não encontrada');
+      }
+      expense.category = category;
+    }
+
     await expenseRepository.save(expense);
 
     return { status: 200, message: 'Despesa atualizada com sucesso!' };

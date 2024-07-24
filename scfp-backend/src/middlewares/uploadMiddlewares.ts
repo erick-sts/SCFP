@@ -7,5 +7,4 @@ const storage = multer.memoryStorage();
 // Cria uma instância do multer com a configuração de armazenamento definida
 const upload = multer({ storage });
 
-// Exporta a instância do multer para ser utilizada em outras partes da aplicação
 export default upload;

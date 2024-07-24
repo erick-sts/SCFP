@@ -21,4 +21,6 @@ export class UserService {
       return { status: 500, message: 'Erro interno do servidor.' };
     }
   }
+
+ 
 }

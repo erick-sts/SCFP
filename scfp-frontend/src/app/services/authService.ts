@@ -1,9 +1,7 @@
 import axios from 'axios';
 
-// Base URL para a API de autenticação
 const AUTH_API_BASE_URL = 'http://localhost:5000/api/auth';
 
-// Função para login
 export const login = async (email: string, password: string) => {
   const data = {
     email: email,
@@ -16,8 +14,10 @@ export const login = async (email: string, password: string) => {
         'Content-Type': 'application/json',
       },
     });
+
     localStorage.setItem('authToken', response.data.token);
-    console.log("Token:", response.data.token);
+    localStorage.setItem('user', JSON.stringify(response.data.user));
+    
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -28,7 +28,11 @@ export const login = async (email: string, password: string) => {
   }
 };
 
-// Função para obter o token do localStorage
 export const getAuthToken = (): string | null => {
-  return localStorage.getItem('authToken'); // Certifique-se de usar a mesma chave para obter o token
+  return localStorage.getItem('authToken');
+};
+
+export const getUserInfo = (): { name: string; photo: string } | null => {
+  const user = localStorage.getItem('user');
+  return user ? JSON.parse(user) : null;
 };

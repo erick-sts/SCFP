@@ -1,30 +1,27 @@
-/* Modal Overlay */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6); /* Um pouco mais escuro */
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 
-/* Modal Content */
 .modalContent {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
   width: 100%;
-  max-width: 600px; /* Aumentado um pouco */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Sombra mais pronunciada */
+  max-width: 600px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   position: relative;
   box-sizing: border-box;
 }
 
-/* Close Button */
 .close {
   position: absolute;
   top: 10px;
@@ -34,11 +31,10 @@
   color: #333;
 }
 
-/* Form Styling */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Maior espaçamento entre os campos */
+  gap: 20px;
 }
 
 .modalContent h2 {
@@ -48,24 +44,21 @@
   text-align: center;
 }
 
-/* Label Styling */
 .label {
   font-weight: 600;
   margin-bottom: 5px;
-  color: #444; /* Cor um pouco mais escura */
+  color: #444;
 }
 
-/* Input Styling */
 .input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #ddd; /* Borda um pouco mais clara */
+  border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
   box-sizing: border-box;
 }
 
-/* Select Styling */
 .select {
   width: 100%;
   padding: 12px;
@@ -75,7 +68,6 @@
   box-sizing: border-box;
 }
 
-/* Button Styling */
 .button {
   padding: 12px 20px;
   font-size: 1rem;
@@ -85,7 +77,7 @@
   cursor: pointer;
   text-align: center;
   border: none;
-  width: 48%; /* Botões lado a lado */
+  width: 48%;
   margin: 0;
   display: inline-block;
 }
@@ -98,8 +90,7 @@
   background-color: #044d01;
 }
 
-/* Container for buttons to align them side by side */
 .buttonContainer {
   display: flex;
-  justify-content: space-between; /* Espaço entre os botões */
+  justify-content: space-between;
 }

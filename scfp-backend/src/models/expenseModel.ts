@@ -1,6 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from './userModel';  // Importa o modelo User
-import { Category } from './categoryModel';  // Importa o modelo Category
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn
+} from 'typeorm';
+import { User } from './userModel';
+import { Category } from './categoryModel';
 
 @Entity()
 export class Expense {
@@ -10,12 +16,18 @@ export class Expense {
   @Column()
   description!: string;
 
-  @Column('decimal')
+  @Column('decimal', { precision: 10, scale: 2, nullable: false }) 
   value!: number;
 
-  @ManyToOne(() => Category, (category) => category.expenses)
+  @ManyToOne(() => Category, { eager: true })
+  @JoinColumn({ name: 'categoryId' })
   category!: Category;
 
-  @ManyToOne(() => User, (user) => user.expenses)
-  user!: User;  // Certifique-se de que a relação com User está definida corretamente
+  @Column()
+  categoryId!: number;
+
+  @ManyToOne(() => User, { eager: true })
+  @JoinColumn({ name: 'userId' })
+  user!: User;
+
 }

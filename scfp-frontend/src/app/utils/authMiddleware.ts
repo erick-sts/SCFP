@@ -10,7 +10,7 @@ const verifyToken = async (token: string) => {
         'Authorization': `Bearer ${token}`,
       },
     });
-    return response.data; // Assumindo que a resposta inclui userId como string
+    return response.data; 
   } catch (error) {
     return null;
   }
@@ -28,7 +28,7 @@ export function useAuth() {
         .then((data) => {
           if (data) {
             setIsAuthenticated(true);
-            setUserId(data.userId); // Assumindo que userId é uma string na resposta
+            setUserId(data.userId);
           } else {
             setIsAuthenticated(false);
             setUserId(null);

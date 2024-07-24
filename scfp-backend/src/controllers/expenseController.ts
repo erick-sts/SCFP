@@ -3,13 +3,10 @@ import { ExpenseService } from '../services/expenseService';
 
 export class ExpenseController {
     static async create(req: Request, res: Response) {
-        const { amount, description, categoryId } = req.body;
+        const { description, amount, categoryId } = req.body;
         const userId = req.userId as number;
-
         try {
-            const response = await ExpenseService.create({
-                amount, description, categoryId,
-            }, userId);
+            const response = await ExpenseService.create({description, amount, categoryId,}, userId);
             return res.status(response.status).json({ message: response.message });
         } catch (error) {
             console.error('Erro ao criar despesa:', error);

@@ -7,39 +7,39 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   display: flex;
-  flex-direction: column; /* Muda a direção do flex para coluna */
-  align-items: center; /* Alinha os itens no centro horizontalmente */
+  flex-direction: column;
+  align-items: center;
 }
 
 .transactionList h2 {
   margin-bottom: 15px;
   font-size: 1.5rem;
   color: #333;
-  text-align: center; /* Garante que o texto do título esteja centralizado */
-  width: 100%; /* Garante que o título ocupe toda a largura disponível */
+  text-align: center;
+  width: 100%;
 }
 
 .columns {
   display: flex;
   justify-content: space-between;
-  width: 100%; /* Garante que as colunas ocupem toda a largura disponível */
+  width: 100%;
 }
 
 .column {
-  width: 48%; /* Ajuste a largura conforme necessário */
+  width: 48%;
 }
 
 .column h3 {
   font-size: 1.2rem;
   color: #333;
   margin-bottom: 10px;
-  text-align: center; /* Garante que o título da coluna esteja centralizado */
+  text-align: center;
 }
 
 .column ul {
   list-style-type: none;
   padding: 0;
-  margin: 0; /* Remove a margem para garantir que a lista ocupe toda a largura da coluna */
+  margin: 0;
 }
 
 .column li {
@@ -57,11 +57,11 @@
 }
 
 .income {
-  background-color: #d4edda; /* Cor de fundo verde claro para receitas */
+  background-color: #d4edda;
 }
 
 .expense {
-  background-color: #f8d7da; /* Cor de fundo vermelho claro para despesas */
+  background-color: #f8d7da;
 }
 
 .icons {
@@ -71,10 +71,31 @@
 
 .icon {
   cursor: pointer;
-  color: #303030; /* Cor dos ícones */
+  color: #303030;
   margin: 5px;
 }
 
 .icon:hover {
-  color: #696969; /* Cor dos ícones ao passar o mouse */
+  color: #696969;
+}
+.incomeExpense{
+  display: flex;
+  flex-direction: row;
+  margin: 5px;
+  gap: 20px;
+}
+
+.total {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: right;
+  
+}
+
+.balance {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
 }

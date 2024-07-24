@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 import { register } from '../services/userService'; 
+import ModalAlert from '../components/modalAlert/ModalAlert';
 
 const RegisterPage = () => {
   const [name, setName] = useState('');
@@ -11,6 +12,10 @@ const RegisterPage = () => {
   const [password, setPassword] = useState('');
   const [photo, setPhoto] = useState<File | null>(null);
   const [error, setError] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState<'success' | 'error' | 'warning' | null>(null); 
+  const [showModal, setShowModal] = useState(false);
+  const [shouldRedirect, setShouldRedirect] = useState(false); 
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,21 +28,31 @@ const RegisterPage = () => {
 
     try {
       const response = await register(name, email, password, photo);
-      console.log(response);
-      router.push('/login'); // Redirecionar para a página de login após o cadastro bem-sucedido
+      setModalMessage('Cadastro realizado com sucesso!');
+      setModalType('success');
+      setShowModal(true);
+      setShouldRedirect(true); 
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setError(error.message);
+        setModalMessage(error.message);
       } else {
-        setError('Erro desconhecido ao registrar usuário');
+        setModalMessage('Erro desconhecido ao registrar usuário');
       }
+      setModalType('error');
+      setShowModal(true);
     }
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setPhoto(e.target.files[0]);
-      document.getElementById('file-chosen')!.textContent = e.target.files[0].name;
+    }
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
+    if (shouldRedirect) {
+      router.push('/login');
     }
   };
 
@@ -96,7 +111,9 @@ const RegisterPage = () => {
               onChange={handlePhotoChange}
               required
             />
-            <span id="file-chosen" className={styles.fileChosen}>Nenhuma foto escolhida</span>
+            <span className={styles.fileChosen}>
+              {photo ? photo.name : 'Nenhuma foto escolhida'}
+            </span>
           </div>
           {error && <p className={styles.error}>{error}</p>}
           <button type="submit" className={styles.button}>Cadastrar</button>
@@ -105,6 +122,15 @@ const RegisterPage = () => {
           <a href="/login">Já tem uma conta? Faça login</a>
         </div>
       </div>
+
+      {showModal && (
+        <ModalAlert
+          message={modalMessage}
+          type={modalType || 'warning'}
+          onClose={handleModalClose}
+          onConfirm={modalType === 'warning' ? handleModalClose : undefined}
+        />
+      )}
     </div>
   );
 };

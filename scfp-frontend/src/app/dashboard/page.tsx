@@ -87,7 +87,6 @@ const DashboardPage: React.FC = () => {
         }
         setAlertType('success');
       } else {
-        // Se não há uma transação para editar, adicione uma nova
         await handleAddTransaction(data.description, data.value, data.categoryId, data.type);
       }
       setShowAlert(true);

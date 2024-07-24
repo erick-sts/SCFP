@@ -1,6 +1,3 @@
-//controlzzzz
-
-
 import React, { useState, useEffect } from 'react';
 import styles from './TransactionForm.module.css';
 import { getCategories } from '../../services/fincancesService';
@@ -9,7 +6,7 @@ export interface TransactionFormProps {
   onAddTransaction: (description: string, value: number, categoryId: number, type: 'income' | 'expense') => void;
   onEditTransaction?: (id: number, description: string, value: number, categoryId: number, type: 'income' | 'expense') => void;
   userId: number;
-  transactionToEdit?: { // Permitir que seja null
+  transactionToEdit?: { 
     id: number;
     description: string;
     value: number;

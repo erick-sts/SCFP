@@ -15,6 +15,8 @@ export class CategoryService {
 
   static async getById(id: number) {
     const categoryRepository = getRepository(Category);
-    return await categoryRepository.findOne({ where: { id } });
+    return await categoryRepository.findOne({
+      where: { id }
+    });
   }
 }

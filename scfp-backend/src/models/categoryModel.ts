@@ -1,10 +1,15 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Income } from './incomeModel';  // Importa o modelo Income
-import { Expense } from './expenseModel';  // Importa o modelo Expense
+import { Income } from './incomeModel';
+import { Expense } from './expenseModel';
 
 export enum CategoryType {
   FIXED = 'fixed',
   VARIABLE = 'variable',
+}
+
+export enum TransactionType {
+  INCOME = 'income',
+  EXPENSE = 'expense',
 }
 
 @Entity()
@@ -17,9 +22,15 @@ export class Category {
 
   @Column({
     type: 'enum',
+    enum: TransactionType,
+  })
+  transactionType!: TransactionType;
+
+  @Column({
+    type: 'enum',
     enum: CategoryType,
   })
-  type!: CategoryType;
+  incomeExpenseType!: CategoryType;
 
   @OneToMany(() => Income, (income) => income.category)
   incomes!: Income[];

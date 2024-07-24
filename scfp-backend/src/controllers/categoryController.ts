@@ -6,7 +6,6 @@ export class CategoryController {
   static async create(req: Request, res: Response) {
     const { name, type } = req.body;
 
-    // Verifica se o tipo é válido
     if (!Object.values(CategoryType).includes(type)) {
       return res.status(400).json({ message: 'Tipo de categoria inválido' });
     }

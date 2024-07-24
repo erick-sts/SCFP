@@ -1,14 +1,12 @@
-// incomeController.ts
 import { Request, Response } from 'express';
 import { IncomeService } from '../services/incomeService';
 
 export class IncomeController {
     static async create(req: Request, res: Response) {
-        const { amount, description, categoryId } = req.body;
+        const { description, amount, categoryId } = req.body;
         const userId = req.userId as number;
-
         try {
-            const response = await IncomeService.create({ amount, description, categoryId }, userId);
+            const response = await IncomeService.create({ description, amount, categoryId }, userId);
             return res.status(response.status).json({ message: response.message });
         } catch (error) {
             console.error('Erro ao criar receita:', error);

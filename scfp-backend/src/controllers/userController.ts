@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 
 export class UserController {
+
+  
   static async register(req: Request, res: Response) {
     const { name, email, password } = req.body;
     const photo = req.file?.buffer;
@@ -13,4 +15,6 @@ export class UserController {
     const response = await UserService.register(name, email, password, photo);
     return res.status(response.status).json({ message: response.message });
   }
+
+  
 }

@@ -11,7 +11,17 @@ export class AuthController {
 
     const response = await AuthService.login(email, password);
     if (response.token) {
-      return res.json({ token: response.token });
+      
+      return res.json({
+        token: response.token,
+        user: {
+          name: response.user.name,
+          photo: response.user.photo
+        
+        }
+        
+      });
+      
     } else {
       return res.status(response.status).json({ message: response.message });
     }
@@ -25,6 +35,15 @@ export class AuthController {
     }
 
     const response = AuthService.verifyToken(token);
-    return res.status(response.status).json(response.status === 200 ? response.decoded : { message: response.message });
+    if (response.status === 200) {
+      if (response.decoded) {
+        return res.json({ userId: response.decoded.id });
+      } else {
+        return res.status(401).json({ message: 'Token inválido.' });
+      }
+    } else {
+      return res.status(response.status).json({ message: response.message });
+    }
   }
+
 }
