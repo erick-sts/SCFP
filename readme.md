@@ -1,5 +1,5 @@
 # 💲 SCFP - Sistema de Controle Financeiro Pessoal 🚀
-### Descrição
+## Descrição
 
 O SCFP é um Sistema de Controle Financeiro Pessoal desenvolvido para ajudar usuários a gerenciar suas receitas e despesas de forma eficiente. O sistema permite a adição, edição e exclusão de transações financeiras, categorização de despesas e receitas, e visualização de gráficos para análise financeira.
 
